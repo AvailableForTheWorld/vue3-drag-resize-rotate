@@ -1,6 +1,5 @@
 {
   "name": "vue3-drag-resize-rotate",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
