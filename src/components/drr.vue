@@ -34,13 +34,13 @@ interface IProps {
   aspectRatio?: boolean
   dragHandle?: string
   dragCancel?: string
-  outerBounds?: {
+  outerBound?: {
     x: number
     y: number
     width: number
     height: number
   }
-  innterBounds?: {
+  innerBound?: {
     x: number
     y: number
     width: number
@@ -65,8 +65,8 @@ const props = withDefaults(defineProps<IProps>(), {
   aspectRatio: false,
   dragHandle: '',
   dragCancel: '',
-  outerBounds: null,
-  innterBounds: null,
+  outerBound: null,
+  innerBound: null,
 })
 
 const {
@@ -84,8 +84,8 @@ const {
   aspectRatio,
   dragHandle,
   dragCancel,
-  outerBounds,
-  innterBounds,
+  outerBound,
+  innerBound,
   onDrag,
   onResize,
 } = toRefs(props)
@@ -177,13 +177,6 @@ const classObject = computed(() => {
 })
 
 const styleObject = computed(() => {
-  console.log('styleObject', {
-    left: curX.value - curWidth.value / 2 + 'px',
-    top: curY.value - curHeight.value / 2 + 'px',
-    width: curWidth.value + 'px',
-    height: curHeight.value + 'px',
-    transform: 'rotate(' + rotation.value + 'deg)',
-  })
   return {
     left: curX.value - curWidth.value / 2 + 'px',
     top: curY.value - curHeight.value / 2 + 'px',
@@ -264,11 +257,11 @@ const stickMove = (e: MouseEvent) => {
     let x2 = newcx + newwidth / 2
     let y2 = newcy + newheight / 2
 
-    if (outerBounds.value && rotation.value === 0) {
-      let bx1 = outerBounds.value.x - outerBounds.value.width / 2
-      let by1 = outerBounds.value.y - outerBounds.value.height / 2
-      let bx2 = outerBounds.value.x + outerBounds.value.width / 2
-      let by2 = outerBounds.value.y + outerBounds.value.height / 2
+    if (outerBound.value && rotation.value === 0) {
+      let bx1 = outerBound.value.x - outerBound.value.width / 2
+      let by1 = outerBound.value.y - outerBound.value.height / 2
+      let bx2 = outerBound.value.x + outerBound.value.width / 2
+      let by2 = outerBound.value.y + outerBound.value.height / 2
       let dx = 0
       let dy = 0
       if (x1 < bx1) dx = bx1 - x1
@@ -292,11 +285,11 @@ const stickMove = (e: MouseEvent) => {
       }
     }
 
-    if (innterBounds.value && rotation.value === 0) {
-      let bx1 = innterBounds.value.x - innterBounds.value.width / 2
-      let by1 = innterBounds.value.y - innterBounds.value.height / 2
-      let bx2 = innterBounds.value.x + innterBounds.value.width / 2
-      let by2 = innterBounds.value.y + innterBounds.value.height / 2
+    if (innerBound.value && rotation.value === 0) {
+      let bx1 = innerBound.value.x - innerBound.value.width / 2
+      let by1 = innerBound.value.y - innerBound.value.height / 2
+      let bx2 = innerBound.value.x + innerBound.value.width / 2
+      let by2 = innerBound.value.y + innerBound.value.height / 2
       let dx = 0
       let dy = 0
       if (x1 > bx1) dx = bx1 - x1
@@ -347,35 +340,34 @@ const bodyMove = (ev: MouseEvent) => {
     x: newPos.mouseX - stickStartPos.value.mouseX,
     y: newPos.mouseY - stickStartPos.value.mouseY,
   }
-  console.log('delta', delta, stickStartPos.value)
-  // let newcx = stickStartPos.value.curX + delta.x
-  // let newcy = stickStartPos.value.curY + delta.y
-  // let x1 = newcx - width.value / 2
-  // let y1 = newcy - height.value / 2
-  // let x2 = newcx + width.value / 2
-  // let y2 = newcy + height.value / 2
+  let newcx = stickStartPos.value.curX + delta.x
+  let newcy = stickStartPos.value.curY + delta.y
+  let x1 = newcx - width.value / 2
+  let y1 = newcy - height.value / 2
+  let x2 = newcx + width.value / 2
+  let y2 = newcy + height.value / 2
 
-  // if (outerBounds.value && rotation.value === 0) {
-  //   let bx1 = outerBounds.value.x - outerBounds.value.width / 2
-  //   let by1 = outerBounds.value.y - outerBounds.value.height / 2
-  //   let bx2 = outerBounds.value.x + outerBounds.value.width / 2
-  //   let by2 = outerBounds.value.y + outerBounds.value.height / 2
-  //   if (x1 < bx1) delta.x -= x1 - bx1
-  //   if (x2 > bx2) delta.x -= x2 - bx2
-  //   if (y1 < by1) delta.y -= y1 - by1
-  //   if (y2 > by2) delta.y -= y2 - by2
-  // }
+  if (outerBound.value && rotation.value === 0) {
+    let bx1 = outerBound.value.x - outerBound.value.width / 2
+    let by1 = outerBound.value.y - outerBound.value.height / 2
+    let bx2 = outerBound.value.x + outerBound.value.width / 2
+    let by2 = outerBound.value.y + outerBound.value.height / 2
+    if (x1 < bx1) delta.x -= x1 - bx1
+    if (x2 > bx2) delta.x -= x2 - bx2
+    if (y1 < by1) delta.y -= y1 - by1
+    if (y2 > by2) delta.y -= y2 - by2
+  }
 
-  // if (innterBounds.value && rotation.value === 0) {
-  //   let bx1 = innterBounds.value.x - innterBounds.value.width / 2
-  //   let by1 = innterBounds.value.y - innterBounds.value.height / 2
-  //   let bx2 = innterBounds.value.x + innterBounds.value.width / 2
-  //   let by2 = innterBounds.value.y + innterBounds.value.height / 2
-  //   if (x1 > bx1) delta.x -= x1 - bx1
-  //   if (x2 < bx2) delta.x -= x2 - bx2
-  //   if (y1 > by1) delta.y -= y1 - by1
-  //   if (y2 < by2) delta.y -= y2 - by2
-  // }
+  if (innerBound.value && rotation.value === 0) {
+    let bx1 = innerBound.value.x - innerBound.value.width / 2
+    let by1 = innerBound.value.y - innerBound.value.height / 2
+    let bx2 = innerBound.value.x + innerBound.value.width / 2
+    let by2 = innerBound.value.y + innerBound.value.height / 2
+    if (x1 > bx1) delta.x -= x1 - bx1
+    if (x2 < bx2) delta.x -= x2 - bx2
+    if (y1 > by1) delta.y -= y1 - by1
+    if (y2 < by2) delta.y -= y2 - by2
+  }
 
   curX.value = stickStartPos.value.curX + delta.x
   curY.value = stickStartPos.value.curY + delta.y
