@@ -1,8 +1,9 @@
 {
   "name": "vue3-drag-resize-rotate",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "types": "packages/components/drr.vue.d.ts",
+  "main": "lib/vue3-drag-resize-rotate.js",
   "files": [
     "lib",
     "packages"
