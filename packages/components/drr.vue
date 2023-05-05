@@ -39,13 +39,13 @@ interface IProps {
     y: number
     width: number
     height: number
-  }
+  } | null
   innerBound?: {
     x: number
     y: number
     width: number
     height: number
-  }
+  } | null
   onDrag?: (e: any) => void
   onResize?: (e: any) => void
 }
@@ -112,8 +112,8 @@ const contentActive = ref(false)
 
 const curX = ref(x.value)
 const curY = ref(y.value)
-const curWidth = ref(width?.value)
-const curHeight = ref(height?.value)
+const curWidth = ref(width?.value || 0)
+const curHeight = ref(height?.value || 0)
 const rotation = ref(angle?.value)
 const stickDrag = ref(false)
 const bodyDrag = ref(false)
@@ -151,7 +151,7 @@ const setRect = (r: any) => {
   curY.value = r.y
   curWidth.value = r.width
   curHeight.value = r.height
-  angle.value = r.angle
+  rotation.value = r.angle
 }
 
 const startRect = ref(getRect())
@@ -203,8 +203,8 @@ const drrStick = computed(() => {
       stickStyle['top'] = `${-STICK_SIZE / 2 - ROTATION_STICK_SIZE}px`
       stickStyle['marginLeft'] = `${-STICK_SIZE / 2 + 1}px`
     } else {
-      stickStyle[STYLE_MAPPING.y[stick[0]]] = `${-STICK_SIZE / 2}px`
-      stickStyle[STYLE_MAPPING.x[stick[1]]] = `${-STICK_SIZE / 2}px`
+      stickStyle[STYLE_MAPPING.y[stick[0] as 't' | 'm' | 'b']] = `${-STICK_SIZE / 2}px`
+      stickStyle[STYLE_MAPPING.x[stick[1] as 'l' | 'm' | 'r']] = `${-STICK_SIZE / 2}px`
     }
     return stickStyle
   }
@@ -319,7 +319,7 @@ const stickMove = (e: MouseEvent) => {
     curWidth.value = stickStartPos.value.width + dirX * pn.x
     curHeight.value = stickStartPos.value.height + dirY * pn.y
 
-    if (onResize.value) setRect(onResize.value(getRect()))
+    if (onResize && onResize.value) setRect(onResize.value(getRect()))
 
     if (!resizeStartEmitted.value) {
       emit('resize-start', startRect.value)
@@ -372,7 +372,7 @@ const bodyMove = (ev: MouseEvent) => {
   curX.value = stickStartPos.value.curX + delta.x
   curY.value = stickStartPos.value.curY + delta.y
 
-  if (onDrag.value) setRect(onDrag.value(getRect()))
+  if (onDrag && onDrag.value) setRect(onDrag.value(getRect()))
 
   if (!dragStartEmitted.value) {
     emit('drag-start', startRect)
@@ -398,12 +398,12 @@ const stickUp = () => {
   }
 
   if (resized.value) {
-    emit('resize-stop', getRect(), startRect.value) // TODO
+    emit('resize-stop', getRect()) // TODO
     emit('change', getRect())
   }
 
   if (rotated.value) {
-    emit('rotate-stop', getRect(), startRect.value)
+    emit('rotate-stop', getRect())
     emit('change', getRect())
   }
 }
@@ -445,7 +445,7 @@ const bodyUp = () => {
   }
 
   if (dragged.value) {
-    emit('drag-stop', getRect(), startRect.value)
+    emit('drag-stop', getRect())
     emit('change', getRect())
   }
 }

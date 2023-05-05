@@ -1,31 +1,22 @@
 export default class Vector {
   x: number
   y: number
-  constructor(x, y) {
-    if (x === undefined) throw new Error('Must provide at least one parameter')
+  constructor(x: number, y: number) {
+    if (typeof x !== 'number' || typeof y !== 'number') throw new Error('Must provide numeric parameters')
 
-    if (y === undefined) {
-      if (!(x instanceof Vector)) throw new Error('Single parameter should be a vector')
-
-      this.x = x.x
-      this.y = x.y
-    } else {
-      if (typeof x !== 'number' || typeof y !== 'number') throw new Error('Must provide numeric parameters')
-
-      this.x = x
-      this.y = y
-    }
+    this.x = x
+    this.y = y
   }
 
   static zero() {
     return new Vector(0, 0)
   }
 
-  add(v) {
+  add(v: Vector) {
     return new Vector(this.x + v.x, this.y + v.y)
   }
 
-  sub(v) {
+  sub(v: Vector) {
     return new Vector(this.x - v.x, this.y - v.y)
   }
 
@@ -33,7 +24,7 @@ export default class Vector {
     return new Vector(-this.x, -this.y)
   }
 
-  mul(v) {
+  mul(v: Vector | number) {
     if (typeof v === 'number') return new Vector(this.x * v, this.y * v)
     else if (v instanceof Vector) return this.x * v.x + this.y * v.y
     else throw new Error('Parameter should be a number or a vector')
@@ -48,7 +39,7 @@ export default class Vector {
     return new Vector(this.x / norm, this.y / norm)
   }
 
-  rotate(angle) {
+  rotate(angle: number) {
     return new Vector(
       this.x * Math.cos(angle) - this.y * Math.sin(angle),
       this.x * Math.sin(angle) + this.y * Math.cos(angle)
@@ -59,11 +50,11 @@ export default class Vector {
     return Math.atan2(this.y, this.x)
   }
 
-  static _equals(a, b, precision = Number.EPSILON) {
+  static _equals(a: number, b: number, precision = Number.EPSILON) {
     return Math.abs(a - b) < precision
   }
 
-  equals(v, precision = Number.EPSILON) {
+  equals(v: Vector, precision = Number.EPSILON) {
     if (v instanceof Vector) return Vector._equals(this.x, v.x, precision) && Vector._equals(this.y, v.y, precision)
     else return false
   }
@@ -72,11 +63,11 @@ export default class Vector {
     return new Vector(this.x, this.y)
   }
 
-  static rad(deg) {
+  static rad(deg: number) {
     return (deg * Math.PI) / 180
   }
 
-  static deg(rad) {
+  static deg(rad: number) {
     return (rad * 180) / Math.PI
   }
 }

@@ -9,13 +9,13 @@ const mock = ref({
   angle: 0,
 })
 
-const handleDragStop = (curRect: any, oldRect: any) => {
+const handleDragStop = (curRect: any) => {
   modifyRect(curRect)
 }
-const handleResizeStop = (curRect: any, oldRect: any) => {
+const handleResizeStop = (curRect: any) => {
   modifyRect(curRect)
 }
-const handleRotateStop = (curRect: any, oldRect: any) => {
+const handleRotateStop = (curRect: any) => {
   modifyRect(curRect)
 }
 
