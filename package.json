@@ -2,9 +2,14 @@
   "name": "vue3-drag-resize-rotate",
   "version": "0.0.3",
   "type": "module",
+  "types": "packages/components/drr.vue.d.ts",
+  "files": [
+    "lib",
+    "packages"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vue-tsc --declaration --emitDeclarationOnly",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
