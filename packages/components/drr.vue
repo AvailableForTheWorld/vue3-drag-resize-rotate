@@ -624,13 +624,16 @@ watch(angle, (val) => {
 })
 </script>
 
-<style scoped>
+<style>
 .drr {
   position: absolute;
   box-sizing: border-box;
   cursor: pointer;
 }
-
+.drr img {
+  width: inherit;
+  height: inherit;
+}
 .drr.active:before {
   content: '';
   width: 100%;

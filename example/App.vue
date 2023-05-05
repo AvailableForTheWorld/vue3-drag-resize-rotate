@@ -41,7 +41,7 @@ const modifyRect = (curRect: any) => {
     @resize-stop="handleResizeStop"
     @rotate-stop="handleRotateStop"
   >
-    <div>你好案件法术抵抗放假啦空手道</div>
+    <img src="./assets/8s.jpg" />
   </drr>
 </template>
 
