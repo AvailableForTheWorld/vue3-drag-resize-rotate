@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import drr from './components/drr.vue'
+import drr from '../packages/components/drr.vue'
 import { ref } from 'vue'
 const mock = ref({
   'x-location': 500,
