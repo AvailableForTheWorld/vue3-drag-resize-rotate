@@ -8,11 +8,13 @@ export default defineConfig({
     outDir: 'lib',
     lib: {
       entry: 'packages/index.ts',
-      name: 'drr',
+      name: 'vue3-drag-resize-rotate',
       fileName: 'vue3-drag-resize-rotate',
+      formats: ['es', 'cjs', 'umd'],
     },
     rollupOptions: {
       external: ['vue'],
+      input: 'packages/index.ts',
       output: {
         globals: {
           vue: 'Vue',

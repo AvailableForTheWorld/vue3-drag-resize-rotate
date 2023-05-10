@@ -20,6 +20,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["/**/*.ts", "/**/*.d.ts", "/**/*.tsx", "/**/*.vue"],
-  "exclude": ["node_modules", "lib"],
+  "exclude": ["node_modules"],
+  "typeRoots": ["./packages/index.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
