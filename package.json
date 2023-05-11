@@ -19,7 +19,6 @@
       "require": "./lib/vue3-drag-resize-rotate.umd.js",
       "import": "./lib/vue3-drag-resize-rotate.mjs"
     },
-    "./package.json": "./package.json",
     "./lib/*": "./lib/*"
   },
   "files": [
