@@ -1,3 +1,7 @@
+# update in 2023/5/20
+
+I have finished the bug for importing component, it work well.
+
 # vue3-drag-resize-rotate
 
 this [repo](https://github.com/AvailableForTheWorld/vue3-drag-resize-rotate) is inspired by [link](https://github.com/minogin/vue-drag-resize-rotate), which is for vue2, so I really want to refresh it as vue3.
