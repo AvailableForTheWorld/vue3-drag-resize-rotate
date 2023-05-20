@@ -1,12 +1,8 @@
 {
   "name": "vue3-drag-resize-rotate",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "type": "module",
   "types": "packages/components/drr.vue.d.ts",
-  "main": "lib/vue3-drag-resize-rotate.umd.js",
-  "module": "lib/vue3-drag-resize-rotate.mjs",
-  "unpkg": "lib/vue3-drag-resize-rotate.umd.js",
-  "jsdelivr": "lib/vue3-drag-resize-rotate.umd.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/AvailableForTheWorld/vue3-drag-resize-rotate"
@@ -14,10 +10,11 @@
   "bugs": {
     "url": "https://github.com/AvailableForTheWorld/vue3-drag-resize-rotate/issues"
   },
+  "style": "./lib/style.css",
   "exports": {
     ".": {
-      "require": "./lib/vue3-drag-resize-rotate.umd.js",
-      "import": "./lib/vue3-drag-resize-rotate.mjs"
+      "require": "./lib/vue3-drag-resize-rotate.js",
+      "import": "./lib/vue3-drag-resize-rotate.js"
     },
     "./lib/*": "./lib/*"
   },
@@ -31,6 +28,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/node": "^20.2.1",
     "nanoid": "^4.0.2",
     "vue": "^3.2.47"
   },

@@ -1,73 +1,76 @@
-<template>
-  <div class="drr" :class="classObject" :style="styleObject" @dblclick="handleDbClick" @mousedown="bodyMouseDown">
-    <slot></slot>
-    <div
-      v-for="stick in sticks"
-      :key="stick"
-      class="drr-stick"
-      :class="['drr-stick-' + stick, resizable ? '' : 'not-resizable']"
-      :style="drrStick(stick)"
-      @mousedown.stop.prevent="stickDown(stick, $event)"
-    ></div>
-    <div v-if="rotatable" class="ro-stick-handle"></div>
-  </div>
-</template>
-
 <script lang="ts" setup>
-import Vector from '../utils/vector'
-import { STICK_SIZE, ROTATION_STICK_SIZE, STYLE_MAPPING } from '../utils/constant'
 import { nanoid } from 'nanoid'
-import { ref, computed, toRefs, watch, onMounted, onBeforeUnmount, withDefaults } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch, withDefaults } from 'vue'
+import Vector from '../utils/vector'
+import { ROTATION_STICK_SIZE, STICK_SIZE, STYLE_MAPPING } from '../utils/constant'
 
-interface IProps {
-  x: number
-  y: number
-  width?: number
-  height?: number
-  angle?: number
-  selected?: boolean
-  selectable?: boolean
-  draggable?: boolean
-  resizable?: boolean
-  rotatable?: boolean
-  hasActiveContent?: boolean
-  aspectRatio?: boolean
-  dragHandle?: string
-  dragCancel?: string
-  outerBound?: {
+const props = withDefaults(
+  defineProps<{
     x: number
     y: number
-    width: number
-    height: number
-  } | null
-  innerBound?: {
-    x: number
-    y: number
-    width: number
-    height: number
-  } | null
-  onDrag?: (e: any) => void
-  onResize?: (e: any) => void
-}
+    width?: number
+    height?: number
+    angle?: number
+    selected?: boolean
+    selectable?: boolean
+    draggable?: boolean
+    resizable?: boolean
+    rotatable?: boolean
+    hasActiveContent?: boolean
+    aspectRatio?: boolean
+    dragHandle?: string
+    dragCancel?: string
+    outerBound?: {
+      x: number
+      y: number
+      width: number
+      height: number
+    } | null
+    innerBound?: {
+      x: number
+      y: number
+      width: number
+      height: number
+    } | null
+    onDrag?: (e: any) => void
+    onResize?: (e: any) => void
+  }>(),
+  {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    angle: 0,
+    selected: false,
+    selectable: true,
+    draggable: true,
+    resizable: true,
+    rotatable: true,
+    hasActiveContent: false,
+    aspectRatio: false,
+    dragHandle: '',
+    dragCancel: '',
+    outerBound: null,
+    innerBound: null,
+  }
+)
 
-const props = withDefaults(defineProps<IProps>(), {
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0,
-  angle: 0,
-  selected: false,
-  selectable: true,
-  draggable: true,
-  resizable: true,
-  rotatable: true,
-  hasActiveContent: false,
-  aspectRatio: false,
-  dragHandle: '',
-  dragCancel: '',
-  outerBound: null,
-  innerBound: null,
-})
+const emit = defineEmits([
+  'select',
+  'deselect',
+  'clicked',
+  'drag',
+  'resize',
+  'rotate',
+  'rotate-start',
+  'rotate-stop',
+  'drag-start',
+  'drag-stop',
+  'resize-start',
+  'resize-stop',
+  'change',
+  'content-active',
+])
 
 const {
   x,
@@ -89,23 +92,6 @@ const {
   onDrag,
   onResize,
 } = toRefs(props)
-
-const emit = defineEmits([
-  'select',
-  'deselect',
-  'clicked',
-  'drag',
-  'resize',
-  'rotate',
-  'rotate-start',
-  'rotate-stop',
-  'drag-start',
-  'drag-stop',
-  'resize-start',
-  'resize-stop',
-  'change',
-  'content-active',
-])
 
 const active = ref(selected.value)
 const contentActive = ref(false)
@@ -158,12 +144,10 @@ const startRect = ref(getRect())
 
 const sticks = computed(() => {
   const arr: string[] = []
-  if (resizable.value) {
-    arr.push('tl', 'tr', 'br', 'bl')
-  }
-  if (rotatable.value) {
-    arr.push('ro')
-  }
+  if (resizable.value) arr.push('tl', 'tr', 'br', 'bl')
+
+  if (rotatable.value) arr.push('ro')
+
   return arr
 })
 
@@ -178,18 +162,18 @@ const classObject = computed(() => {
 
 const styleObject = computed(() => {
   return {
-    left: curX.value - curWidth.value / 2 + 'px',
-    top: curY.value - curHeight.value / 2 + 'px',
-    width: curWidth.value + 'px',
-    height: curHeight.value + 'px',
-    transform: 'rotate(' + rotation.value + 'deg)',
+    left: `${curX.value - curWidth.value / 2}px`,
+    top: `${curY.value - curHeight.value / 2}px`,
+    width: `${curWidth.value}px`,
+    height: `${curHeight.value}px`,
+    transform: `rotate(${rotation.value}deg)`,
   }
 })
 
 const handleDbClick = () => {
-  if (!selectable.value) {
-    return
-  }
+  if (!selectable.value) return
+
+  // eslint-disable-next-line vue/custom-event-name-casing
   emit('content-active')
 }
 
@@ -199,9 +183,9 @@ const drrStick = computed(() => {
       width: `${STICK_SIZE}px`,
       height: `${STICK_SIZE}px`,
     }
-    if (stick == 'ro') {
-      stickStyle['top'] = `${-STICK_SIZE / 2 - ROTATION_STICK_SIZE}px`
-      stickStyle['marginLeft'] = `${-STICK_SIZE / 2 + 1}px`
+    if (stick === 'ro') {
+      stickStyle.top = `${-STICK_SIZE / 2 - ROTATION_STICK_SIZE}px`
+      stickStyle.marginLeft = `${-STICK_SIZE / 2 + 1}px`
     } else {
       stickStyle[STYLE_MAPPING.y[stick[0] as 't' | 'm' | 'b']] = `${-STICK_SIZE / 2}px`
       stickStyle[STYLE_MAPPING.x[stick[1] as 'l' | 'm' | 'r']] = `${-STICK_SIZE / 2}px`
@@ -229,6 +213,7 @@ const stickMove = (e: MouseEvent) => {
     up = up.rotate(rotationRad)
     const v = up.add(delta)
     if (!rotateStartEmitted.value) {
+      // eslint-disable-next-line vue/custom-event-name-casing
       emit('rotate-start', startRect.value)
       rotateStartEmitted.value = true
     }
@@ -248,20 +233,20 @@ const stickMove = (e: MouseEvent) => {
       p = delta
     }
     let pn = p.rotate(-phi)
-    let newcx = stickStartPos.value.curX + p.x / 2
-    let newcy = stickStartPos.value.curY + p.y / 2
-    let newwidth = stickStartPos.value.width + dirX * pn.x
-    let newheight = stickStartPos.value.height + dirY * pn.y
-    let x1 = newcx - newwidth / 2
-    let y1 = newcy - newheight / 2
-    let x2 = newcx + newwidth / 2
-    let y2 = newcy + newheight / 2
+    const newcx = stickStartPos.value.curX + p.x / 2
+    const newcy = stickStartPos.value.curY + p.y / 2
+    const newwidth = stickStartPos.value.width + dirX * pn.x
+    const newheight = stickStartPos.value.height + dirY * pn.y
+    const x1 = newcx - newwidth / 2
+    const y1 = newcy - newheight / 2
+    const x2 = newcx + newwidth / 2
+    const y2 = newcy + newheight / 2
 
     if (outerBound.value && rotation.value === 0) {
-      let bx1 = outerBound.value.x - outerBound.value.width / 2
-      let by1 = outerBound.value.y - outerBound.value.height / 2
-      let bx2 = outerBound.value.x + outerBound.value.width / 2
-      let by2 = outerBound.value.y + outerBound.value.height / 2
+      const bx1 = outerBound.value.x - outerBound.value.width / 2
+      const by1 = outerBound.value.y - outerBound.value.height / 2
+      const bx2 = outerBound.value.x + outerBound.value.width / 2
+      const by2 = outerBound.value.y + outerBound.value.height / 2
       let dx = 0
       let dy = 0
       if (x1 < bx1) dx = bx1 - x1
@@ -269,7 +254,7 @@ const stickMove = (e: MouseEvent) => {
       if (y1 < by1) dy = by1 - y1
       if (y2 > by2) dy = by2 - y2
 
-      if (dx != 0 || dy != 0) {
+      if (dx !== 0 || dy !== 0) {
         if (aspectRatio.value) {
           if (dx / p.x < dy / p.y) {
             p.y += (dx * p.y) / p.x
@@ -286,10 +271,10 @@ const stickMove = (e: MouseEvent) => {
     }
 
     if (innerBound.value && rotation.value === 0) {
-      let bx1 = innerBound.value.x - innerBound.value.width / 2
-      let by1 = innerBound.value.y - innerBound.value.height / 2
-      let bx2 = innerBound.value.x + innerBound.value.width / 2
-      let by2 = innerBound.value.y + innerBound.value.height / 2
+      const bx1 = innerBound.value.x - innerBound.value.width / 2
+      const by1 = innerBound.value.y - innerBound.value.height / 2
+      const bx2 = innerBound.value.x + innerBound.value.width / 2
+      const by2 = innerBound.value.y + innerBound.value.height / 2
       let dx = 0
       let dy = 0
       if (x1 > bx1) dx = bx1 - x1
@@ -297,7 +282,7 @@ const stickMove = (e: MouseEvent) => {
       if (y1 > by1) dy = by1 - y1
       if (y2 < by2) dy = by2 - y2
 
-      if (dx != 0 || dy != 0) {
+      if (dx !== 0 || dy !== 0) {
         if (aspectRatio.value) {
           if (dx / p.x < dy / p.y) {
             p.y += (dx * p.y) / p.x
@@ -319,9 +304,10 @@ const stickMove = (e: MouseEvent) => {
     curWidth.value = stickStartPos.value.width + dirX * pn.x
     curHeight.value = stickStartPos.value.height + dirY * pn.y
 
-    if (onResize && onResize.value) setRect(onResize.value(getRect()))
+    if (onResize?.value) setRect(onResize.value(getRect()))
 
     if (!resizeStartEmitted.value) {
+      // eslint-disable-next-line vue/custom-event-name-casing
       emit('resize-start', startRect.value)
       resizeStartEmitted.value = true
     }
@@ -340,18 +326,18 @@ const bodyMove = (ev: MouseEvent) => {
     x: newPos.mouseX - stickStartPos.value.mouseX,
     y: newPos.mouseY - stickStartPos.value.mouseY,
   }
-  let newcx = stickStartPos.value.curX + delta.x
-  let newcy = stickStartPos.value.curY + delta.y
-  let x1 = newcx - width.value / 2
-  let y1 = newcy - height.value / 2
-  let x2 = newcx + width.value / 2
-  let y2 = newcy + height.value / 2
+  const newcx = stickStartPos.value.curX + delta.x
+  const newcy = stickStartPos.value.curY + delta.y
+  const x1 = newcx - width.value / 2
+  const y1 = newcy - height.value / 2
+  const x2 = newcx + width.value / 2
+  const y2 = newcy + height.value / 2
 
   if (outerBound.value && rotation.value === 0) {
-    let bx1 = outerBound.value.x - outerBound.value.width / 2
-    let by1 = outerBound.value.y - outerBound.value.height / 2
-    let bx2 = outerBound.value.x + outerBound.value.width / 2
-    let by2 = outerBound.value.y + outerBound.value.height / 2
+    const bx1 = outerBound.value.x - outerBound.value.width / 2
+    const by1 = outerBound.value.y - outerBound.value.height / 2
+    const bx2 = outerBound.value.x + outerBound.value.width / 2
+    const by2 = outerBound.value.y + outerBound.value.height / 2
     if (x1 < bx1) delta.x -= x1 - bx1
     if (x2 > bx2) delta.x -= x2 - bx2
     if (y1 < by1) delta.y -= y1 - by1
@@ -359,10 +345,10 @@ const bodyMove = (ev: MouseEvent) => {
   }
 
   if (innerBound.value && rotation.value === 0) {
-    let bx1 = innerBound.value.x - innerBound.value.width / 2
-    let by1 = innerBound.value.y - innerBound.value.height / 2
-    let bx2 = innerBound.value.x + innerBound.value.width / 2
-    let by2 = innerBound.value.y + innerBound.value.height / 2
+    const bx1 = innerBound.value.x - innerBound.value.width / 2
+    const by1 = innerBound.value.y - innerBound.value.height / 2
+    const bx2 = innerBound.value.x + innerBound.value.width / 2
+    const by2 = innerBound.value.y + innerBound.value.height / 2
     if (x1 > bx1) delta.x -= x1 - bx1
     if (x2 < bx2) delta.x -= x2 - bx2
     if (y1 > by1) delta.y -= y1 - by1
@@ -372,9 +358,10 @@ const bodyMove = (ev: MouseEvent) => {
   curX.value = stickStartPos.value.curX + delta.x
   curY.value = stickStartPos.value.curY + delta.y
 
-  if (onDrag && onDrag.value) setRect(onDrag.value(getRect()))
+  if (onDrag?.value) setRect(onDrag.value(getRect()))
 
   if (!dragStartEmitted.value) {
+    // eslint-disable-next-line vue/custom-event-name-casing
     emit('drag-start', startRect)
     dragStartEmitted.value = true
   }
@@ -398,11 +385,13 @@ const stickUp = () => {
   }
 
   if (resized.value) {
+    // eslint-disable-next-line vue/custom-event-name-casing
     emit('resize-stop', getRect()) // TODO
     emit('change', getRect())
   }
 
   if (rotated.value) {
+    // eslint-disable-next-line vue/custom-event-name-casing
     emit('rotate-stop', getRect())
     emit('change', getRect())
   }
@@ -445,31 +434,29 @@ const bodyUp = () => {
   }
 
   if (dragged.value) {
+    // eslint-disable-next-line vue/custom-event-name-casing
     emit('drag-stop', getRect())
     emit('change', getRect())
   }
 }
 
+const judgeIsDrag = () => {
+  return stickDrag.value || bodyDrag.value
+}
 const onMouseMove = (e: MouseEvent) => {
-  if (!judgeIsDrag()) {
-    return
-  }
+  if (!judgeIsDrag()) return
+
   e.stopPropagation()
   if (stickDrag.value) {
     // debugger
     stickMove(e)
   }
-  if (bodyDrag.value) {
-    bodyMove(e)
-  }
+  if (bodyDrag.value) bodyMove(e)
 }
 const onMouseUp = () => {
-  if (stickDrag.value) {
-    stickUp()
-  }
-  if (bodyDrag.value) {
-    bodyUp()
-  }
+  if (stickDrag.value) stickUp()
+
+  if (bodyDrag.value) bodyUp()
 }
 
 const deSelect = () => {
@@ -493,23 +480,18 @@ const bodyMouseDown = (e: MouseEvent) => {
 
   active.value = true
 
-  if (e.button && e.button !== 0) {
-    return
-  }
+  if (e.button && e.button !== 0) return
 
   emit('clicked', e)
 
-  if (!draggable.value || !active.value) {
-    return
-  }
+  if (!draggable.value || !active.value) return
 
   // FIXME: UID
   if (
     dragHandle.value &&
     (target.getAttribute('data-drag-handle') !== 'true' || target.getAttribute('data-drag-cancel') === null)
-  ) {
+  )
     return
-  }
 
   bodyDrag.value = true
   dragged.value = false
@@ -526,10 +508,6 @@ const bodyMouseDown = (e: MouseEvent) => {
 
 const onMouseLeave = () => {
   onMouseUp()
-}
-
-const judgeIsDrag = () => {
-  return stickDrag.value || bodyDrag.value
 }
 
 const addListenerEvent = () => {
@@ -571,11 +549,8 @@ onBeforeUnmount(() => {
 })
 
 watch(active, (val) => {
-  if (val) {
-    emit('select')
-  } else {
-    emit('deselect')
-  }
+  if (val) emit('select')
+  else emit('deselect')
 })
 
 watch(selected, (val) => {
@@ -587,42 +562,52 @@ watch(hasActiveContent, (val) => {
 })
 
 watch(x, (val) => {
-  if (judgeIsDrag()) {
-    return
-  }
+  if (judgeIsDrag()) return
+
   curX.value = val
 })
 
 watch(y, (val) => {
-  if (judgeIsDrag()) {
-    return
-  }
+  if (judgeIsDrag()) return
+
   curY.value = val
 })
 
 watch(width, (val) => {
-  if (judgeIsDrag()) {
-    return
-  }
+  if (judgeIsDrag()) return
+
   currentStick.value = ['m', 'r']
   curWidth.value = val
 })
 
 watch(height, (val) => {
-  if (judgeIsDrag()) {
-    return
-  }
+  if (judgeIsDrag()) return
+
   currentStick.value = ['b', 'm']
   curHeight.value = val
 })
 
 watch(angle, (val) => {
-  if (judgeIsDrag()) {
-    return
-  }
+  if (judgeIsDrag()) return
+
   rotation.value = val
 })
 </script>
+
+<template>
+  <div class="drr" :class="classObject" :style="styleObject" @dblclick="handleDbClick" @mousedown="bodyMouseDown">
+    <slot />
+    <div
+      v-for="stick in sticks"
+      :key="stick"
+      class="drr-stick"
+      :class="[`drr-stick-${stick}`, resizable ? '' : 'not-resizable']"
+      :style="drrStick(stick)"
+      @mousedown.stop.prevent="stickDown(stick, $event)"
+    />
+    <div v-if="rotatable" class="ro-stick-handle" />
+  </div>
+</template>
 
 <style>
 .drr {
